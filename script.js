@@ -1,43 +1,69 @@
-const visor = document.querySelector('.visor');
-const botoes = document.querySelectorAll('.button');
+const display = document.querySelector('.display');
+const buttons = document.querySelectorAll('.button');
 
-//button logic
-botoes.forEach(button => {
-
-//button click
+//buttons
+buttons.forEach(button => {
     button.addEventListener('click', () => {
-        
         const value = button.innerText;
         
-//commands
+        //command
         if (value === 'C') {
-            visor.innerText = '0';
+            display.innerText = '0';
         }
         
+        //delete
+        else if (value === '⌫') {
+            // Se só tem 1 dígito ou deu Erro, volta pra 0
+            if (display.innerText.length === 1 || display.innerText === 'Error') {
+                display.innerText = '0';
+            } else {
+                // A função .slice(0, -1) corta a última letra do texto
+                display.innerText = display.innerText.slice(0, -1);
+            }
+        }
+        
+        //smart parentheses and expression
+        else if (value === '( )') {
+            const abertos = (display.innerText.match(/\(/g) || []).length;
+            const fechados = (display.innerText.match(/\)/g) || []).length;
+            const ultimo = display.innerText.slice(-1);
+
+            if (abertos > fechados && ultimo !== '(' && ultimo !== '+' && ultimo !== '-' && ultimo !== 'x' && ultimo !== '÷') {
+                display.innerText += ')';
+            } else {
+                if (display.innerText === '0') {
+                    display.innerText = '(';
+                } else {
+                    display.innerText += '(';
+                }
+            }
+        }
+        
+        //operations
         else if (value === '=') {
             try {
-                let account = visor.innerText
-                    .replace('X', '*')
-                    .replace('÷', '/')
-                    .replace(',', '.');
+                let account = display.innerText
+                    .replace(/x/g, '*')    
+                    .replace(/÷/g, '/')    
+                    .replace(/,/g, '.')    
+                    .replace(/%/g, '/100'); 
 
                 let result = eval(account);
 
-                visor.innerText = result.toString().replace('.', ',');
+                display.innerText = result.toString().replace('.', ',');
                 
             } catch (error) {
-                visor.innerText = "Error";
-                setTimeout(() => { visor.innerText = '0'; }, 1500);
+                display.innerText = "Error";
+                setTimeout(() => { display.innerText = '0'; }, 1500);
             }
         }
         
         else {
-            if (visor.innerText === '0') {
-                visor.innerText = value;
+            if (display.innerText === '0') {
+                display.innerText = value;
             } else {
-                visor.innerText += value;
+                display.innerText += value;
             }
         }
-        
     });
 });
